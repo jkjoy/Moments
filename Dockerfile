@@ -1,3 +1,4 @@
+# 前端构建阶段
 FROM node:22.2.0-alpine AS front
 WORKDIR /app
 COPY front/package*.json ./
@@ -5,9 +6,10 @@ RUN npm install
 COPY front/. .
 RUN npm run generate
 
+# 后端构建阶段
 FROM golang:1.22.5-alpine AS backend
 ENV CGO_ENABLED=1
-RUN apk add build-base
+RUN apk add --no-cache build-base
 WORKDIR /app
 COPY backend/go.mod .
 COPY backend/go.sum .
@@ -18,9 +20,10 @@ COPY --from=front /app/.output/public /app/public
 RUN apk update --no-cache && apk add --no-cache tzdata
 RUN go build -tags prod -ldflags="-s -w" -o /app/moments
 
+# 最终运行阶段
 FROM alpine
 ARG VERSION
-RUN apk update --no-cache && apk add --no-cache ca-certificates
+RUN apk update --no-cache && apk add --no-cache ca-certificates tzdata
 COPY --from=backend /usr/share/zoneinfo/Asia/Shanghai /usr/share/zoneinfo/Asia/Shanghai
 ENV TZ=Asia/Shanghai
 WORKDIR /app/data
