@@ -1,12 +1,12 @@
-FROM node:22.2.0-alpine as front
+FROM node:22.2.0-alpine AS front
 WORKDIR /app
 COPY front/package*.json ./
 RUN npm install
 COPY front/. .
 RUN npm run generate
 
-FROM golang:1.22.5-alpine as backend
-ENV CGO_ENABLED 1
+FROM golang:1.22.5-alpine AS backend
+ENV CGO_ENABLED=1
 RUN apk add build-base
 WORKDIR /app
 COPY backend/go.mod .
@@ -22,11 +22,11 @@ FROM alpine
 ARG VERSION
 RUN apk update --no-cache && apk add --no-cache ca-certificates
 COPY --from=backend /usr/share/zoneinfo/Asia/Shanghai /usr/share/zoneinfo/Asia/Shanghai
-ENV TZ Asia/Shanghai
+ENV TZ=Asia/Shanghai
 WORKDIR /app/data
-ENV VERSION $VERSION
+ENV VERSION=$VERSION
 COPY --from=backend /app/moments /app/moments
-ENV PORT 3000
+ENV PORT=3000
 EXPOSE 3000
 RUN chmod +x /app/moments
 CMD ["/app/moments"]
