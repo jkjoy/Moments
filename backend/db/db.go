@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/glebarez/sqlite"
-	"github.com/kingwrcy/moments/vo"
+	"github.com/kingwrcy/jkjoy/vo"
 	"github.com/rs/zerolog"
 	"github.com/samber/do/v2"
 	"gorm.io/gorm"
