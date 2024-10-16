@@ -3,8 +3,8 @@ package handler
 import (
 	"encoding/json"
 	"errors"
-	"github.com/kingwrcy/moments/db"
-	"github.com/kingwrcy/moments/vo"
+	"github.com/jkjoy/moments/db"
+	"github.com/jkjoy/moments/vo"
 	"github.com/labstack/echo/v4"
 	"github.com/samber/do/v2"
 	"gorm.io/gorm"
