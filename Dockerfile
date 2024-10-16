@@ -13,8 +13,8 @@ RUN apk add --no-cache build-base
 WORKDIR /app
 COPY backend/go.mod .
 COPY backend/go.sum .
-RUN go mod download
 RUN go mod tidy
+RUN go mod download
 RUN go list -m all  # 检查所有依赖项是否正确
 COPY backend/. .
 COPY --from=front /app/.output/public /app/public
