@@ -3,6 +3,7 @@ module github.com/jkjoy/moments
 go 1.22.4
 
 require (
+        github.com/go-resty/resty v2.15.3
 	github.com/PuerkitoBio/goquery v1.9.2
 	github.com/aws/aws-sdk-go-v2 v1.30.3
 	github.com/aws/aws-sdk-go-v2/config v1.27.27
