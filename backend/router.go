@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/kingwrcy/moments/handler"
-	"github.com/kingwrcy/moments/vo"
+	"github.com/jkjoy/moments/handler"
+	"github.com/jkjoy/moments/vo"
 	"github.com/labstack/echo/v4"
 	"github.com/samber/do/v2"
 	echoSwagger "github.com/swaggo/echo-swagger"
