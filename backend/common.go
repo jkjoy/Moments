@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	"github.com/kingwrcy/moments/vo"
+	"github.com/jkjoy/moments/vo"
 	"github.com/rs/zerolog"
 )
 
