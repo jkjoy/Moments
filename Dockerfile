@@ -20,6 +20,7 @@ COPY backend/. .
 COPY --from=front /app/.output/public /app/public
 RUN apk update --no-cache && apk add --no-cache tzdata
 RUN go get -d -v ./...  # 获取所有依赖项
+RUN go get golang.org/x/sys/unix  # 手动添加缺失的依赖项
 RUN set -x && go build -tags prod -ldflags="-s -w" -o /app/moments  # 启用详细日志输出
 
 # 最终运行阶段
