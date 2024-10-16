@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"github.com/golang-jwt/jwt/v5"
-	model "github.com/kingwrcy/moments/db"
-	"github.com/kingwrcy/moments/handler"
-	"github.com/kingwrcy/moments/vo"
+	model "github.com/jkjoy/moments/db"
+	"github.com/jkjoy/moments/handler"
+	"github.com/jkjoy/moments/vo"
 	"github.com/labstack/echo/v4"
 	"github.com/samber/do/v2"
 	"gorm.io/gorm"
