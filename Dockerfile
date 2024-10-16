@@ -13,6 +13,7 @@ ENV CGO_ENABLED=1
 RUN apk add --no-cache build-base tzdata
 COPY backend/go.mod .
 COPY backend/go.sum .
+RUN go mod tidy
 RUN go mod download
 COPY backend/. .
 COPY --from=front /app/.output/public /app/public
