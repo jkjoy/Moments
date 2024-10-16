@@ -3,7 +3,8 @@ services:
     image: jkjoy/moments:latest
     environment:
       JWT_KEY: "BbYS93dHHfIC1cQR8rI6"
-      FEISHU_WEBHOOK_URL: "https://open.feishu.cn/open-apis/bot/v2/hook/*"
+      FEISHU_WEBHOOK_URL: "https://open.feishu.cn/open-apis/bot/v2/hook/*" #飞书webhook 
+      SITE_URL: "https://www.moments.cn" #访问地址
     ports:
       - "3000:3000"
     volumes:
