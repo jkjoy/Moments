@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/google/uuid"
-	"github.com/kingwrcy/moments/vo"
-	"github.com/rs/zerolog"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/google/uuid"
+	"github.com/kingwrcy/moments/vo"
+	"github.com/rs/zerolog"
 )
 
 func handleEmptyConfig(log zerolog.Logger, cfg *vo.AppConfig) {

@@ -4,17 +4,21 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"net/url"
+	"os"
+	"strconv"
+	"time"
+
+	"github.com/go-resty/resty/v2"
 	"github.com/kingwrcy/moments/db"
 	"github.com/kingwrcy/moments/vo"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog"
 	"github.com/samber/do/v2"
 	"gorm.io/gorm"
-	"io"
-	"net/http"
-	"net/url"
-	"strconv"
-	"time"
 )
 
 type CommentHandler struct {
@@ -156,7 +160,63 @@ func (c CommentHandler) AddComment(ctx echo.Context) error {
 	comment.MemoId = req.MemoID
 
 	if err = c.base.db.Save(&comment).Error; err == nil {
+		// 调用 handleNewComment 函数
+		handleNewComment(comment)
 		return SuccessResp(ctx, h{})
 	}
 	return FailRespWithMsg(ctx, Fail, "发表评论失败")
+}
+
+// SendFeishuWebhook 发送飞书 Webhook
+func SendFeishuWebhook(webhookURL string, message string) error {
+	client := resty.New()
+
+	payload := FeishuWebhookPayload{
+		MsgType: "text",
+		Content: struct {
+			Text string `json:"text"`
+		}{
+			Text: message,
+		},
+	}
+
+	resp, err := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(payload).
+		Post(webhookURL)
+
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode() != 200 {
+		return fmt.Errorf("failed to send webhook, status code: %d", resp.StatusCode())
+	}
+
+	log.Println("Webhook sent successfully")
+	return nil
+}
+
+func handleNewComment(comment db.Comment) {
+	webhookURL := os.Getenv("FEISHU_WEBHOOK_URL")
+	if webhookURL == "" {
+		log.Println("FEISHU_WEBHOOK_URL environment variable is not set")
+		return
+	}
+
+	message := fmt.Sprintf("你的Memo ID: %d 下有新的评论:\n %s给 %s 回复: %s",
+		comment.MemoId, comment.Username, comment.ReplyTo, comment.Content)
+
+	err := SendFeishuWebhook(webhookURL, message)
+	if err != nil {
+		log.Printf("Failed to send webhook: %v", err)
+	}
+}
+
+// FeishuWebhookPayload 是飞书 Webhook 的请求体结构
+type FeishuWebhookPayload struct {
+	MsgType string `json:"msg_type"`
+	Content struct {
+		Text string `json:"text"`
+	} `json:"content"`
 }

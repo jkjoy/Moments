@@ -28,6 +28,7 @@ COPY --from=backend /usr/share/zoneinfo/Asia/Shanghai /usr/share/zoneinfo/Asia/S
 ENV TZ=Asia/Shanghai
 WORKDIR /app/data
 ENV VERSION=$VERSION
+ENV FEISHU_WEBHOOK_URL="https://open.feishu.cn/open-apis/bot/v2/hook/"
 COPY --from=backend /app/moments /app/moments
 ENV PORT=3000
 EXPOSE 3000

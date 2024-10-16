@@ -4,6 +4,8 @@ package main
 
 import (
 	"fmt"
+
+	"github.com/go-resty/resty/v2"
 	"github.com/ilyakaznacheev/cleanenv"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/kingwrcy/moments/db"
@@ -66,4 +68,42 @@ func main() {
 	if err != nil {
 		myLogger.Fatal().Msgf("服务启动失败,错误原因:%s", err)
 	}
+}
+
+// FeishuWebhookPayload 是飞书 Webhook 的请求体结构
+type FeishuWebhookPayload struct {
+	MsgType string `json:"msg_type"`
+	Content struct {
+		Text string `json:"text"`
+	} `json:"content"`
+}
+
+// SendFeishuWebhook 发送飞书 Webhook
+func SendFeishuWebhook(webhookURL string, message string) error {
+	client := resty.New()
+
+	payload := FeishuWebhookPayload{
+		MsgType: "text",
+		Content: struct {
+			Text string `json:"text"`
+		}{
+			Text: message,
+		},
+	}
+
+	resp, err := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(payload).
+		Post(webhookURL)
+
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode() != 200 {
+		return fmt.Errorf("failed to send webhook, status code: %d", resp.StatusCode())
+	}
+
+	log.Println("Webhook sent successfully")
+	return nil
 }
