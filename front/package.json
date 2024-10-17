@@ -10,10 +10,10 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@fancyapps/ui": "^5.0.36",
     "@iconify-json/carbon": "^1.1.36",
     "@nuxt/ui": "^2.18.2",
     "date-fns": "^3.6.0",
+    "jquery": "^3.7.1",
     "markdown-it": "^14.1.0",
     "nuxt": "^3.12.4",
     "v-calendar": "^3.1.2",

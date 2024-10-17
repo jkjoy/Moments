@@ -19,7 +19,7 @@
             <UIcon v-if="($route.path === `/memo/${item.id}` && (global.userinfo.id === 1 || global.userinfo.id === item.userId))" name="i-iconamoon-menu-kebab-vertical-bold" class="text-red-500 ml-2 dark:text-white cursor-pointer" @click="moreToolbar = true" />
           </div>
         </div>
-        <div class="mb-2">
+        <div class="mb-2" id="view-2">
           <div :style="getMemoMaxHeightStyle()" class="overflow-hidden">
             <div class="markdown-content " ref="contentRef"
                  v-html="content"></div>
@@ -37,7 +37,7 @@
           </div>
         </div>
 
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2"  id="view">
           <external-url-preview :favicon="item.externalFavicon" :title="item.externalTitle" :url="item.externalUrl"
                                 v-if="item.externalFavicon&&item.externalTitle&&item.externalUrl"/>
           <upload-image-preview :imgs="item.imgs||''" :memo-id="item.id"/>
