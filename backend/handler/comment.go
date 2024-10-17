@@ -204,8 +204,14 @@ func handleNewComment(comment db.Comment) {
 		return
 	}
 
-	message := fmt.Sprintf("你的Memo ID: %d 下有新的评论:\n %s给 %s 回复: %s",
-		comment.MemoId, comment.Username, comment.ReplyTo, comment.Content)
+	siteURL := os.Getenv("SITE_URL")
+	if siteURL == "" {
+		log.Println("SITE_URL environment variable is not set")
+		return
+	}
+
+	message := fmt.Sprintf("你有新的评论:\n %s/memo/%d  \n%s 回复 %s : %s",
+		siteURL, comment.MemoId, comment.Username, comment.ReplyTo, comment.Content)
 
 	err := SendFeishuWebhook(webhookURL, message)
 	if err != nil {
