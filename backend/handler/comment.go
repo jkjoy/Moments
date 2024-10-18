@@ -167,11 +167,11 @@ func (c CommentHandler) AddComment(ctx echo.Context) error {
 	return FailRespWithMsg(ctx, Fail, "发表评论失败")
 }
 
-// SendFeishuWebhook 发送飞书 Webhook
-func SendFeishuWebhook(webhookURL string, message string) error {
+// SendWebhook 发送 Webhook
+func SendWebhook(webhookURL string, message string) error {
 	client := resty.New()
 
-	payload := FeishuWebhookPayload{
+	payload := WebhookPayload{
 		MsgType: "text",
 		Content: struct {
 			Text string `json:"text"`
@@ -197,10 +197,42 @@ func SendFeishuWebhook(webhookURL string, message string) error {
 	return nil
 }
 
+// SendQQWebhook 发送 QQ Webhook
+func SendQQWebhook(webhookURL string, userID int64, message string) error {
+	client := resty.New()
+
+	payload := QQWebhookPayload{
+		UserID:  userID,
+		Message: message,
+	}
+
+	resp, err := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(payload).
+		Post(webhookURL)
+
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode() != 200 {
+		return fmt.Errorf("failed to send QQ webhook, status code: %d", resp.StatusCode())
+	}
+
+	log.Println("QQ Webhook sent successfully")
+	return nil
+}
+
 func handleNewComment(comment db.Comment) {
-	webhookURL := os.Getenv("FEISHU_WEBHOOK_URL")
+	webhookURL := os.Getenv("WEBHOOK_URL")
 	if webhookURL == "" {
-		log.Println("FEISHU_WEBHOOK_URL environment variable is not set")
+		log.Println("WEBHOOK_URL environment variable is not set")
+		return
+	}
+
+	qqWebhookURL := os.Getenv("QQ_WEBHOOK_URL")
+	if qqWebhookURL == "" {
+		log.Println("QQ_WEBHOOK_URL environment variable is not set")
 		return
 	}
 
@@ -210,19 +242,38 @@ func handleNewComment(comment db.Comment) {
 		return
 	}
 
-	message := fmt.Sprintf("你有新的评论:\n %s/memo/%d  \n%s 回复 %s : %s",
-		siteURL, comment.MemoId, comment.Username, comment.ReplyTo, comment.Content)
+	userID, err := strconv.ParseInt(os.Getenv("QQ_USER_ID"), 10, 64)
+	if err != nil {
+		log.Println("QQ_USER_ID environment variable is not set or invalid")
+		return
+	}
 
-	err := SendFeishuWebhook(webhookURL, message)
+	message := fmt.Sprintf("你有新的评论:  \n%s 回复 %s : %s" \n %s/memo/%d,
+		comment.Username, comment.ReplyTo, comment.Content, siteURL, comment.MemoId)
+
+	// 发送普通 Webhook
+	err = SendWebhook(webhookURL, message)
 	if err != nil {
 		log.Printf("Failed to send webhook: %v", err)
 	}
+
+	// 发送 QQ Webhook
+	err = SendQQWebhook(qqWebhookURL, userID, message)
+	if err != nil {
+		log.Printf("Failed to send QQ webhook: %v", err)
+	}
 }
 
-// FeishuWebhookPayload 是飞书 Webhook 的请求体结构
-type FeishuWebhookPayload struct {
+// WebhookPayload 是普通 Webhook 的请求体结构
+type WebhookPayload struct {
 	MsgType string `json:"msg_type"`
 	Content struct {
 		Text string `json:"text"`
 	} `json:"content"`
+}
+
+// QQWebhookPayload 是 QQ Webhook 的请求体结构
+type QQWebhookPayload struct {
+	UserID  int64  `json:"user_id"`
+	Message string `json:"message"`
 }
