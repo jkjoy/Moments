@@ -10,7 +10,7 @@ services:
       JWT_KEY: "BbYS93dHHfIC1cQR8rI6"
       WEBHOOK_URL: "https://open.feishu.cn/open-apis/bot/v2/hook/*" #飞书webhook 
       SITE_URL: "https://www.moments.cn" #访问地址
-      QQ_WEBHOOK_URL: "https://http.asbid.cn" #QQ机器人的API
+      QQ_WEBHOOK_URL: "https://http.asbid.cn/send_private_msg" #QQ机器人的API
       QQ_USER_ID: "123456" #接收消息的QQ号码
     ports:
       - "3000:3000"
@@ -28,9 +28,11 @@ mod版本增加了webhook评论通知
 `SITE_URL`为你的moments的访问地址, 可以是域名,也可以是ip地址.用来拼接memo的访问地址
 
 `QQ_WEBHOOK_URL`为你使用的QQ机器人的API地址,需要自行部署,或者使用公共服务
-`QQ_USER_ID`为你接收消息的QQ号码
+使用gocqhttp的API接口
+端点地址`/send_private_msg`时`QQ_USER_ID`为你接收消息的QQ号码.
+端点`/send_group_msg`时,`QQ_USER_ID`为你接收消息的QQ群号码.
 
-修改了`fancybox`为`viewimage`
+修改了`fancybox`为`viewimage`.
 
 
 
