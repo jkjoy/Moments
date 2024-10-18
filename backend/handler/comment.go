@@ -248,7 +248,7 @@ func handleNewComment(comment db.Comment) {
 		return
 	}
 
-	message := fmt.Sprintf("你有新的评论:  \n%s 回复 %s : %s" \n %s/memo/%d,
+	message := fmt.Sprintf("你有新的评论:  \n%s 回复 %s : %s\n%s/memo/%d",
 		comment.Username, comment.ReplyTo, comment.Content, siteURL, comment.MemoId)
 
 	// 发送普通 Webhook
