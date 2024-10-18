@@ -1,5 +1,58 @@
 ## Moments 极简朋友圈
 
+docker-compose.yaml 配置文件如下:
+
+```yaml
+services:
+  moments:
+    image: jkjoy/moments:latest
+    environment:
+      JWT_KEY: "BbYS93dHHfIC1cQR8rI6"
+      WEBHOOK_URL: "https://open.feishu.cn/open-apis/bot/v2/hook/*" #飞书webhook 
+      SITE_URL: "https://www.moments.cn" #访问地址
+      QQ_WEBHOOK_URL: "https://http.asbid.cn" #QQ机器人的API
+      QQ_USER_ID: "123456" #接收消息的QQ号码
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+```
+
+mod版本增加了webhook评论通知
+
+没有修改原版的数据库,使用系统变量读取,
+
+`WEBHOOK_URL`为你使用的webhook地址, 可以是飞书webhook, 也可以是其他的.
+`SITE_URL`为你的moments的访问地址, 可以是域名,也可以是ip地址.用来拼接memo的访问地址
+
+`QQ_WEBHOOK_URL`为你使用的QQ机器人的API地址,需要自行部署,或者使用公共服务
+`QQ_USER_ID`为你接收消息的QQ号码
+
+修改了`fancybox`为`viewimage`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```md
 v0.2.1使用了golang作为服务端重写,目前已经基本实现了0.2.0版本的大部分功能.包体积更小了.
 
 1. 增加了多用户模式,后台可以自由开启是否运行注册多用户.
@@ -34,3 +87,4 @@ v0.2.1使用了golang作为服务端重写,目前已经基本实现了0.2.0版�
 6. 增加`回到顶部`按钮,pc和手机模式下都有.
 7. 修复登出按钮在pc无法看到的bug.
 8. 代码块增加一键复制按钮.
+```
