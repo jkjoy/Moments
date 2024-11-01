@@ -13,11 +13,8 @@
       <div class="flex flex-col gap-1  flex-1">
         <div class="username text-[#576b95] mb-1 dark:text-white  flex justify-between">
           <NuxtLink class="cursor-pointer" :to="`/user/${item.user.id}`">{{ item.user.nickname }}</NuxtLink>
-          <div>
-            <UIcon v-if="item.pinned" name="i-carbon-pin"/>
-            <UIcon v-if="item.showType === 0" name="i-carbon-locked" class="text-red-500 ml-2 dark:text-white"/>
-            <UIcon v-if="($route.path === `/memo/${item.id}` && (global.userinfo.id === 1 || global.userinfo.id === item.userId))" name="i-iconamoon-menu-kebab-vertical-bold" class="text-red-500 ml-2 dark:text-white cursor-pointer" @click="moreToolbar = true" />
-          </div>
+          <UIcon v-if="item.pinned" name="i-carbon-pin"/>
+          <UIcon v-if="item.showType === 0" name="i-carbon-locked" class="text-red-500"/>
         </div>
         <div class="mb-2" id="view-2">
           <div :style="getMemoMaxHeightStyle()" class="overflow-hidden">
@@ -60,7 +57,7 @@
         </div>
 
         <div class="flex justify-between items-center relative">
-          <div class="flex text-xs text-[#9DA4B0]">{{
+          <div class="text-xs text-[#9DA4B0]">{{
               sysConfig.timeFormat === 'timeAgo' ? $dayjs(item.createdAt).fromNow() : $dayjs(item.createdAt).format("YYYY-MM-DD HH:mm:ss")
             }}
           </div>
@@ -73,47 +70,44 @@
           </div>
 
           <div ref="toolbarRef" v-if="showToolbar"
-               class="absolute top-[-8px] right-[32px] bg-[#4c4c4c] rounded text-white p-2">
+               class="absolute top-[-8px] right-[32px] bg-[#4c4c4c] rounded text-white p-2 px-4">
             <div class="flex flex-row gap-2">
-              <div class="flex flex-row gap-1 cursor-pointer items-center px-4" @click="likeMemo(item.id)">
+              <template v-if="global.userinfo.id === 1">
+                <div class="flex flex-row gap-1 cursor-pointer items-center" @click="setPinned(item.id)">
+                  <UIcon name="i-carbon-pin"/>
+                  <div class="hidden sm:block">{{ item.pinned ? '取消' : '' }}置顶</div>
+                </div>
+                <span class="bg-[#6b7280] h-[20px] w-[1px]"></span>
+              </template>
+              <div class="flex flex-row gap-1 cursor-pointer items-center" @click="likeMemo(item.id)">
                 <UIcon name="i-carbon-favorite" :class="[liked ? 'text-red-400' : '']"/>
-                <div>赞</div>
+                <div class="hidden sm:block">赞</div>
               </div>
               <template v-if="sysConfig.enableComment">
                 <span class="bg-[#6b7280] h-[20px] w-[1px]"></span>
-                <div class="flex flex-row gap-1 cursor-pointer items-center px-4" @click="doComment">
-                  <UIcon name="i-octicon-comment"/>
-                  <div>评论</div>
+                <div class="flex flex-row gap-1 cursor-pointer items-center" @click="doComment">
+                  <UIcon name="i-carbon-chat"/>
+                  <div class="hidden sm:block">评论</div>
                 </div>
               </template>
-            </div>
-          </div>
-          <template>
-            <UModal v-model="moreToolbar" :ui="{container: 'sm:items-end'}">
-              <div class="flex items-center justify-center gap-8 p-4 text-gray-500 dark:text-white">
-                <template v-if="global.userinfo.id === 1">
-                  <div class="flex flex-col gap-1 cursor-pointer items-center" @click="setPinned(item.id)">
-                    <UIcon class="text-[#9fc84a] w-5 h-5" name="i-carbon-pin"/>
-                    <div>{{ item.pinned ? '取消' : '' }}置顶</div>
-                  </div>
-                </template>
-                <template v-if="global&&global.userinfo.id === item.userId">
-                  <div class="flex flex-col gap-1 cursor-pointer items-center" @click="go2Edit(item.id)">
-                    <UIcon class="text-[#9fc84a] w-5 h-5" name="i-carbon-edit"/>
-                    <div>编辑</div>
-                  </div>
-                </template>
-                <template v-if="(global.userinfo.id === 1 || global.userinfo.id === item.userId) ">
-                <Confirm @ok="removeMemo(item.id)" @cancel="moreToolbar = false">
-                  <div class="flex flex-col gap-1 cursor-pointer items-center">
-                    <UIcon class="text-[#9fc84a] w-5 h-5" name="i-carbon-trash-can"/>
-                  <div>删除</div>
+              <template v-if="global&&global.userinfo.id === item.userId">
+                <span class="bg-[#6b7280] h-[20px] w-[1px]"></span>
+                <div class="flex flex-row gap-1 cursor-pointer items-center" @click="go2Edit(item.id)">
+                  <UIcon name="i-carbon-edit"/>
+                  <div class="hidden sm:block">编辑</div>
+                </div>
+              </template>
+              <template v-if="(global.userinfo.id === 1 || global.userinfo.id === item.userId) ">
+                <span class="bg-[#6b7280] h-[20px] w-[1px]"></span>
+                <Confirm @ok="removeMemo(item.id)" @cancel="showToolbar = false">
+                  <div class="flex flex-row gap-1 cursor-pointer items-center">
+                    <UIcon name="i-carbon-trash-can"/>
+                    <div class="hidden sm:block">删除</div>
                   </div>
                 </Confirm>
               </template>
-              </div>
-            </UModal>
-          </template>
+            </div>
+          </div>
         </div>
 
         <div class="rounded bottom-shadow bg-[#f7f7f7] dark:bg-[#202020] flex flex-col gap-1"
@@ -177,8 +171,6 @@ const item = computed(() => {
 
 const global = useGlobalState()
 
-const moreToolbar = ref(false)
-
 const showToolbar = ref(false)
 const toolbarRef = ref(null)
 const liked = ref(false)
@@ -226,18 +218,15 @@ const removeMemo = async (id: number) => {
   } else {
     memoReloadEvent.emit()
   }
-  moreToolbar.value = false
+  showToolbar.value = false
 }
 const setPinned = async (id: number) => {
   await useMyFetch('/memo/setPinned?id=' + id)
   toast.success("操作成功!")
-  if (isDetailPage.value) {
-    await navigateTo('/')
-  } else {
-    memoReloadEvent.emit()
-  }
-  moreToolbar.value = false
+  showToolbar.value = false
+  memoReloadEvent.emit()
 }
+
 
 const doLike = async (id: number, token: string = '') => {
   const likes = JSON.parse(localStorage.getItem('likeMemos') || '[]') as Array<number>
